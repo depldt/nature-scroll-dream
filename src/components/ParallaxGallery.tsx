@@ -67,7 +67,6 @@ const galleryItems: GalleryItem[] = [
 
 export default function ParallaxGallery() {
   const [visibleItems, setVisibleItems] = useState<GalleryItem[]>([]);
-  const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,22 +87,6 @@ export default function ParallaxGallery() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Change background based on scroll position
-  useEffect(() => {
-    if (backgroundImages.length === 0) return;
-    
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    if (scrollHeight <= 0) return;
-    
-    const scrollProgress = scrollY / scrollHeight;
-    const newBgIndex = Math.floor(scrollProgress * backgroundImages.length);
-    const clampedIndex = Math.max(0, Math.min(newBgIndex, backgroundImages.length - 1));
-    
-    if (clampedIndex !== currentBgIndex && backgroundImages[clampedIndex]) {
-      setCurrentBgIndex(clampedIndex);
-    }
-  }, [scrollY, currentBgIndex]);
 
   // Load more items
   const loadMoreItems = useCallback(() => {
@@ -177,20 +160,40 @@ export default function ParallaxGallery() {
     return () => window.removeEventListener('scroll', throttledOptimization);
   }, [visibleItems.length]);
 
+  // Create infinite background array for seamless looping
+  const getBackgroundsForHeight = () => {
+    const viewportHeight = window.innerHeight;
+    const backgroundHeight = viewportHeight; // Each background takes full viewport height
+    const totalContentHeight = Math.max(5000, visibleItems.length * 600); // Estimate content height
+    const backgroundsNeeded = Math.ceil(totalContentHeight / backgroundHeight) + 2; // Extra for smooth scrolling
+    
+    const backgrounds = [];
+    for (let i = 0; i < backgroundsNeeded; i++) {
+      const bgIndex = i % backgroundImages.length;
+      backgrounds.push({
+        ...backgroundImages[bgIndex],
+        position: i * backgroundHeight
+      });
+    }
+    return backgrounds;
+  };
+
   return (
     <div ref={containerRef} className="relative min-h-screen">
-      {/* Fixed Parallax Background */}
-      {backgroundImages.length > 0 && backgroundImages[currentBgIndex] && (
-        <div 
-          className="fixed inset-0 w-full h-full bg-cover bg-center bg-fixed transition-all duration-1000 ease-out"
+      {/* Scrolling Parallax Backgrounds */}
+      {backgroundImages.length > 0 && getBackgroundsForHeight().map((bg, index) => (
+        <div
+          key={`${bg.id}-${index}`}
+          className="fixed inset-0 w-full h-full bg-cover bg-center transition-all duration-1000 ease-out"
           style={{
-            backgroundImage: `url(${backgroundImages[currentBgIndex].image})`,
-            transform: `translateY(${scrollY * -0.3}px)`,
+            backgroundImage: `url(${bg.image})`,
+            transform: `translateY(${(bg.position - scrollY * 0.3)}px)`,
+            zIndex: -1
           }}
         >
           <div className="absolute inset-0 bg-black/20" />
         </div>
-      )}
+      ))}
 
       {/* Header */}
       <header className="relative z-20 pt-8 pb-16">
