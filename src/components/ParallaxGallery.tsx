@@ -5,6 +5,9 @@ import { cn } from '@/lib/utils';
 import bgMountainSunset from '@/assets/bg-mountain-sunset.jpg';
 import bgForestMist from '@/assets/bg-forest-mist.jpg';
 import bgOceanCliffs from '@/assets/bg-ocean-cliffs.jpg';
+import bgLakeMountains from '@/assets/bg-lake-mountains.jpg';
+import bgAuroraWilderness from '@/assets/bg-aurora-wilderness.jpg';
+import bgDesertDunes from '@/assets/bg-desert-dunes.jpg';
 
 // Import foreground images
 import waterfallTropical from '@/assets/waterfall-tropical.jpg';
@@ -30,6 +33,9 @@ const backgroundImages: BackgroundImage[] = [
   { id: 'bg1', image: bgMountainSunset, name: 'Mountain Sunset' },
   { id: 'bg2', image: bgForestMist, name: 'Forest Mist' },
   { id: 'bg3', image: bgOceanCliffs, name: 'Ocean Cliffs' },
+  { id: 'bg4', image: bgLakeMountains, name: 'Lake Mountains' },
+  { id: 'bg5', image: bgAuroraWilderness, name: 'Aurora Wilderness' },
+  { id: 'bg6', image: bgDesertDunes, name: 'Desert Dunes' },
 ];
 
 const galleryItems: GalleryItem[] = [
@@ -179,7 +185,7 @@ export default function ParallaxGallery() {
           className="fixed inset-0 w-full h-full bg-cover bg-center bg-fixed transition-all duration-1000 ease-out"
           style={{
             backgroundImage: `url(${backgroundImages[currentBgIndex].image})`,
-            transform: `translateY(${scrollY * 0.5}px)`,
+            transform: `translateY(${scrollY * -0.3}px)`,
           }}
         >
           <div className="absolute inset-0 bg-black/20" />
@@ -217,34 +223,13 @@ export default function ParallaxGallery() {
             {visibleItems.map((item, index) => (
               <article 
                 key={item.id}
-                className={cn(
-                  "opacity-0 animate-fade-in",
-                  "grid md:grid-cols-2 gap-8 items-center",
-                  index % 2 === 1 ? "md:grid-flow-col-dense" : ""
-                )}
+                className="opacity-0 animate-fade-in"
                 style={{
                   animationDelay: `${(index % 3) * 200}ms`
                 }}
               >
-                {/* Image */}
-                <div className={cn(
-                  "relative group overflow-hidden rounded-2xl shadow-2xl",
-                  index % 2 === 1 ? "md:col-start-2" : ""
-                )}>
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-80 md:h-96 object-cover transition-transform duration-700 group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-
                 {/* Content */}
-                <div className={cn(
-                  "backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-2xl p-8 shadow-xl border border-white/20",
-                  index % 2 === 1 ? "md:col-start-1 md:row-start-1" : ""
-                )}>
+                <div className="backdrop-blur-md bg-white/70 dark:bg-gray-900/70 p-8 shadow-xl border border-white/20 mb-6">
                   <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-display">
                     {item.title}
                   </h2>
@@ -262,6 +247,17 @@ export default function ParallaxGallery() {
                       })}
                     </time>
                   </div>
+                </div>
+
+                {/* Image */}
+                <div className="relative group overflow-hidden shadow-2xl w-full">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-80 md:h-96 object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </article>
             ))}
