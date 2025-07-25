@@ -85,12 +85,16 @@ export default function ParallaxGallery() {
 
   // Change background based on scroll position
   useEffect(() => {
+    if (backgroundImages.length === 0) return;
+    
     const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollHeight <= 0) return;
+    
     const scrollProgress = scrollY / scrollHeight;
     const newBgIndex = Math.floor(scrollProgress * backgroundImages.length);
-    const clampedIndex = Math.min(newBgIndex, backgroundImages.length - 1);
+    const clampedIndex = Math.max(0, Math.min(newBgIndex, backgroundImages.length - 1));
     
-    if (clampedIndex !== currentBgIndex) {
+    if (clampedIndex !== currentBgIndex && backgroundImages[clampedIndex]) {
       setCurrentBgIndex(clampedIndex);
     }
   }, [scrollY, currentBgIndex]);
@@ -170,15 +174,17 @@ export default function ParallaxGallery() {
   return (
     <div ref={containerRef} className="relative min-h-screen">
       {/* Fixed Parallax Background */}
-      <div 
-        className="fixed inset-0 w-full h-full bg-cover bg-center bg-fixed transition-all duration-1000 ease-out"
-        style={{
-          backgroundImage: `url(${backgroundImages[currentBgIndex].image})`,
-          transform: `translateY(${scrollY * 0.5}px)`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/20" />
-      </div>
+      {backgroundImages.length > 0 && backgroundImages[currentBgIndex] && (
+        <div 
+          className="fixed inset-0 w-full h-full bg-cover bg-center bg-fixed transition-all duration-1000 ease-out"
+          style={{
+            backgroundImage: `url(${backgroundImages[currentBgIndex].image})`,
+            transform: `translateY(${scrollY * 0.5}px)`,
+          }}
+        >
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+      )}
 
       {/* Header */}
       <header className="relative z-20 pt-8 pb-16">
